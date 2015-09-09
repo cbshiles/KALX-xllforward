@@ -1,59 +1,59 @@
 // bootstrap.h - bootstrap a curve
 #pragma once
-#include "fmspwflat.h"
 #include "newton.h"
+#include "fmspwflat.h"
 
 namespace fms {
 namespace bootstrap {
 
 	template<class T, class F>
-	inline F present_value(size_t m, const T* u, const F* c, size_t n, const T* t, const F* f)
+	inline F present_value(size_t m, const T* u, const F* c, size_t n, const T* t, const F* f, const F& _f = std::numeric_limits<F>::quiet_NaN())
 	{
 		F pv{0};
 
 		for (size_t i = 0; i < m; ++i)
-			pv += c[i]*pwflat::discount(u[i], n, t, f);
+			pv += c[i]*pwflat::discount(u[i], n, t, f, _f);
 
 		return pv;
 	}
 
-	// d(pv)/df for parallel shift past u0
+	// derivative of present value wrt parallels shift of forward curve
 	template<class T, class F>
-	inline F duration(const T& u0, size_t m, const T* u, const F* c, size_t n, const T* t, const F* f)
+	inline F duration(size_t m, const T* u, const F* c, size_t n, const T* t, const F* f, const F& _f = std::numeric_limits<F>::quiet_NaN())
 	{
-		auto ui = std::lower_bound(u, u + m, u0);
-
 		F dur{0};
+
 		for (size_t i = ui - u; i < m; ++i) {
-			dur -= (u[i] - u0)*(c[i])*pwflat::discount(u[i], n, t, f);
+			dur -= u[i]*c[i]*pwflat::discount(u[i], n, t, f, _f);
 		}
 
 		return dur;
 	}
 
-	// extend f(t) to make present value  of c[i] at u[i] equal to p
+	// extend f(t) to make present value of c[i] at u[i] equal to p using initial guess _f
 	template<class T, class F>
-	inline F step(size_t m, const T* u, const F* c, size_t n, const T* t, const F* f, F p = 0, F _f = 0)
+	inline F next(size_t m, const T* u, const F* c, size_t n, const T* t, const F* f, F p = 0, F _f = 0)
 	{
 		// current maximum curve time
 		T t0 = n > 0 ? t[n - 1] : 0;
 
 		auto ui = std::upper_bound(u, u + m, t0);
-		// no cash flows past t0
-		ensure (ui != u + m);
+		if (ui == u + m)
+			throw std::runtime_error(__FILE__ ": " __FUNCTION__ ": no cash flows past end of curve");
 
 		// present values of cash flows to curve end
 		F p0 = present_value(ui - u, u, c, n, t, f);
 
+		// skip cash flows to curve end
 		m -= ui - u;
 		u += ui - u;
 		c += ui - u;
 
 		auto f = [p,p0,m,u,c,n,t,f](F _f) {
-			return -p + p0 + present_value(m, u, c, n, t, f);
+			return -p + p0 + present_value(m, u, c, n, t, f, _f);
 		};
-		auto df = [t0,m,u,c,n,t,f](F _f) {
-			return duration(t0, m, u, c, n, t, f);
+		auto df = [m,u,c,n,t,f](F _f) {
+			return duration(m, u, c, n, t, f, _f);
 		};
 
 		// initial bootstrap guess
@@ -65,3 +65,12 @@ namespace bootstrap {
 
 } // bootstrap
 } // fms
+
+#ifdef _DEBUG
+#include <cassert>
+
+inline void test_fms_bootstrap()
+{
+}
+
+#endif // _DEBUG

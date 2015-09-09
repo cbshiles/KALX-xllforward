@@ -27,5 +27,16 @@
     <ClInclude Include="fmsbootstrap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="xllforward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fmsbond.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="xllforward.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
