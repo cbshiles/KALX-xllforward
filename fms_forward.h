@@ -1,7 +1,7 @@
 // fmsforward.h - forward curve
 #pragma once
 #include <vector>
-#include "fmsbootstrap.h"
+#include "fms_bootstrap.h"
 
 namespace fms {
 namespace pwflat {
@@ -19,6 +19,11 @@ namespace pwflat {
 		{
 			if (t.size() != f.size())
 				throw std::runtime_error(__FILE__ ": " __FUNCTION__ ": times and forwards must be the same size");
+		}
+
+		const curve<T,F>& curve() const
+		{
+			return curve<T,F>(t.size(), t.data(), f.data());
 		}
 
 		bool operator==(const forward& c) const
@@ -53,6 +58,17 @@ namespace pwflat {
 		F discount(const T& u) const
 		{
 			return discount(u, size(), t.data(), f.data());
+		}
+
+		// extend curve
+		forward& next(const instrument<T,F> i, F p = 0, F _f = 0)
+		{
+			_f = bootstrap::next(i, curve(), p, _f);
+
+			t.push_back(i.last());
+			f.push_back(_f);
+
+			return *this;
 		}
 	};
 

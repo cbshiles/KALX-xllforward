@@ -1,4 +1,4 @@
-// fmspwflat.h - piecewise flat curve
+// fms_pwflat.h - piecewise flat curve
 /*
 	f(t) = f[i] if t[i-1] < t <= t[i]; 
 	     = _f if t > t[n-1];

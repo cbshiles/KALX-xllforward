@@ -152,10 +152,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="fmsbond.h" />
-    <ClInclude Include="fmsbootstrap.h" />
-    <ClInclude Include="fmsforward.h" />
-    <ClInclude Include="fmspwflat.h" />
+    <ClInclude Include="fms_bootstrap.h" />
+    <ClInclude Include="fms_curve.h" />
+    <ClInclude Include="fms_forward.h" />
+    <ClInclude Include="fms_pwflat.h" />
+    <ClInclude Include="fms_instrument.h" />
     <ClInclude Include="newton.h" />
     <ClInclude Include="xllforward.h" />
   </ItemGroup>

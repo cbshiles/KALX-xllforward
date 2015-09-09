@@ -15,22 +15,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="fmsforward.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fmspwflat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="newton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fmsbootstrap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="xllforward.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fmsbond.h">
+    <ClInclude Include="fms_instrument.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fms_bootstrap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fms_forward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fms_pwflat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fms_curve.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
