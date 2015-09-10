@@ -22,7 +22,7 @@ Similarly, we can find a unique constant forward rate, \(f_1\), over the maturit
 to the maturity of the second instrument that reprices it. Continuing in this manner constructs a
 piecewise constant forward curve that reprices all instruments.
 
-## Remarks
+### Remarks
 
 It is not always the case we can bootstrap arbitrary data. E.g., if the cash flows are all positive
 and the price is negative, there is no solution even if we allow negative forward rates.
@@ -31,7 +31,7 @@ Since the bootstrap method leaves the curve to from 0 to the previous maturity f
 or require extreme forward rates to reprice the next instrument. It is a good idea to keep successive
 maturities well spaced and be sure the prices you use are actually traded in the market.
 
-## fms_pwflat.h
+## `fms_pwflat.h`
 
 We use forward curves that are piecewise constant. They are specified by
 times, \(t_i\), forwards, \(f_i\), and an extrapolation value \(_f\).
@@ -40,9 +40,35 @@ The curve is not defined for \(t < 0\).
 
 The function `value` calculates the value of a forward curve as described above.
 It returns not-a-number (NaN) when the curve is not defined.
-The function `integral` compute the integral of a piecewise constant curve.
-The functons `discount`, `spot`, and `forward` are defined in terms of these.
+The function `integral` computes the integral of a piecewise constant curve.
+The functons `discount` and `spot` are defined in terms of these.
+Note how only `value` and `integral` do error checking and return NaN's
+instead of throwing exceptions. The other functions return NaN's on error.
 
-## fms_instrument.h
+## `fms_curve.h`
 
-An instrument is a sequence of cash flows, c[i], at time u[i]. 
+The struct `curve` collects the size, time pointer, forward pointer, and the extrapolation constant.
+It provides equality tests, allows curves to be used as function objects, and provides
+the `last` time point in the curve before extrapolation kicks in.
+
+The class `vector_curve` is a value type and provides `push_back` to add points past the end of the curve.
+
+## `fms_instrument.h`
+
+The struct `instrument` collects the size, time pointer, and cash flow pointer.
+It provides equality tests an provides the `last` maturity.
+
+The class `vector_instrument` is an `instrument` that is a value type.
+
+The class `bond` is a `vector_instrument` that models simple, periodic bonds and allows for short first coupons.
+
+## `fms_bootstrap.h`
+
+This file defines `present_value` and `duration` in the `fms::pwflat` namespace that can be called using `instruments` and `curves`.
+In the `fms::bootstrap` namespace the function `next` returns the next forward rate that will reprice the
+given `instrument` using the curve that has been built up to that point.
+
+## `fms_forward.h`
+
+The `fms::pwflat::forward` class allows you bootstrap forward curves using instruments. Instantiate
+a foward curve, then call `next(i,p)` with a instruments of increasing maturity and their prices.

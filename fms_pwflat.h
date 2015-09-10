@@ -108,7 +108,7 @@ inline void test_fms_pwflat()
 		f[2] = f2;
 		assert (!monotonic(std::rbegin(f), std::rend(f)));
 	}
-	{ // value
+	{ // forward
 		assert (isnan(value<int,double>(0, 0, nullptr, nullptr)));
 		int u;
 		u = 1;
@@ -124,7 +124,7 @@ inline void test_fms_pwflat()
 		x_ = fms::pwflat::value<int,double>(u, 0, nullptr, nullptr, x);
 		assert (x_ != x_);
 		assert (isnan(x_));
-		//		assert (x == value<int,double>(0, 0, nullptr, nullptr, 0.1)); // !!!VS 2015 compiler error
+		//		assert (x == forward<int,double>(0, 0, nullptr, nullptr, 0.1)); // !!!VS 2015 compiler error
 
 		for (int i = 0; i < 3; ++i)
 			assert (f[i] == value(t[i], t.size(), t.data(), f.data()));
@@ -148,7 +148,7 @@ inline void test_fms_pwflat()
 		assert (.1 + .2 + .3*.5 == integral(u, t.size(), t.data(), f.data()));
 		u = 3;
 		assert (.1 + .2 + .3 == integral(u, t.size(), t.data(), f.data()));
-		assert (.1 + .2 + .3 != .6);
+		assert (.1 + .2 + .3 != .6); //!!!
 	}
 	{ // discount
 	  //!!! add tests

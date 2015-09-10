@@ -6,14 +6,6 @@
 
 namespace fms {
 
-	enum frequency { 
-		NONE = 0,
-		ANNUAL = 1,
-		SEMIANNUAL = 2,
-		QUARTERLY = 4,
-		MONTHLY = 12
-	};
-
 	// NOT a value type
 	template<class U = double, class C = double>
 	struct instrument {
@@ -39,6 +31,7 @@ namespace fms {
 		}
 	};
 
+	//!!! put in another file
 	template<class U = double, class C = double>
 	class vector_instrument : public instrument<U,C> {
 	protected:
@@ -59,6 +52,15 @@ namespace fms {
 		}
 
 		// insert(U, C) ...
+	};
+
+	//!!! put in another file
+	enum frequency { 
+		NONE = 0,
+		ANNUAL = 1,
+		SEMIANNUAL = 2,
+		QUARTERLY = 4,
+		MONTHLY = 12
 	};
 
 	template<class U = double, class C = double>

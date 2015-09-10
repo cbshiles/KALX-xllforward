@@ -6,10 +6,7 @@ namespace fms {
 namespace newton {
 
 	template<class X, class Y>
-	using function = std::function<Y(X)>;
-
-	template<class X, class Y>
-	inline X step(const X& x, const function<X,Y>& f, const function<X,Y>& df, const Y& m = 0.5)
+	inline X step(const X& x, const std::function<Y(X)>& f, const std::function<Y(X)>& df, const Y& m = 0.5)
 	{
 		Y dfx = df(x);
 
@@ -21,7 +18,7 @@ namespace newton {
 	}
 
 	template<class X, class Y>
-	inline X root(X x, const function<X,Y>& f, const function<X,Y>& df, int n = 2)
+	inline X root(X x, const std::function<Y(X)>& f, const std::function<Y(X)>& df, int n = 2)
 	{
 		X x_ = step(x, f, df);
 #ifdef _DEBUG
@@ -54,14 +51,15 @@ inline void test_fms_newton(int n = 1000)
 	dre.seed((unsigned)time(0));
 	std::uniform_real_distribution<> u;
 	{
-		auto f = [](double x) { return x*x - 2; };
+		double a = 1/u(dre);
+		auto f = [a](double x) { return x*x - a; };
 		auto df = [](double x) { return 2*x; };
 
-		double sqrt2 = sqrt(2);
+		double sqrta = sqrt(a);
 		for (int i = 0; i < n; ++i) {
 			double x = 1/u(dre);
 			double r = fms::newton::root<double,double>(x, f, df);
-			assert (fabs(sqrt2 - r) <= 2*std::numeric_limits<double>::epsilon());
+			assert (fabs(sqrta - r) <= 2*std::numeric_limits<double>::epsilon());
 		}
 	}
 }
