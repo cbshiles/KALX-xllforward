@@ -1,4 +1,5 @@
 // fms_curve.h - set of points for a curve
+// IDEA: template<class T, class F> class curve { T t; F f; iterator_traits<F>::value_type _f; ... }
 #pragma once
 #include <vector>
 #include "fms_pwflat.h"
