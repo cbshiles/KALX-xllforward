@@ -5,6 +5,7 @@
 #include "fms_pwflat.h"
 
 namespace fms {
+namespace pwflat {
 
 	// NOT a value type
 	template<class T = double, class F = double>
@@ -32,6 +33,14 @@ namespace fms {
 		F operator()(const T& u) const
 		{
 			return pwflat::value(u, n, t, f, _f);
+		}
+		F spot(const T& u) const
+		{
+			return spot(u, n,t,f);
+		}
+		F discount(const T& u) const
+		{
+			return discount(u, n,t,f);
 		}
 
 		// last maturity in curve
@@ -86,8 +95,10 @@ namespace fms {
 
 			return *this;
 		}
+
 	};
 
+} // pwflat
 } // fms
 
 #ifdef _DEBUG
@@ -98,7 +109,7 @@ inline void test_fms_curve()
 	using namespace fms;
 
 	{
-		curve<> c;
+		pwflat::curve<> c;
 		assert (c.n == 0);
 		auto c2 = c;
 		assert (c2 == c);
@@ -106,14 +117,24 @@ inline void test_fms_curve()
 		assert (!(c != c2));
 	}
 	{
-		vector_curve<> c(std::vector<double>{1,2,3}, std::vector<double>{.1,.2,.3});
+		double t[] = {1,2,3};
+		double f[] = {.1,.2,.3};
+
+		pwflat::curve<> c0(3,t,f);
+		pwflat::vector_curve<> c1(std::vector<double>(std::begin(t),std::end(t)), std::vector<double>(std::begin(f),std::end(f)));
+		//!!! add more tests, e.g is c0 == c1? do copy constructor/assignment work?
+	}
+	{ //!!! test operator(), spot, discount
+	}
+	{
+		pwflat::vector_curve<> c(std::vector<double>{1,2,3}, std::vector<double>{.1,.2,.3});
 		auto c2 = c;
 		assert (c2 == c);
 		assert (c.n == 3);
 		assert (c.t[0] == 1);
 		assert (c.f[2] == .3);
 
-		vector_curve<> c3;
+		pwflat::vector_curve<> c3;
 		assert (c3.n == 0);
 		c3.push_back(c.t[0], c.f[0]);
 		assert (c3.n == 1);

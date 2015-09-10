@@ -19,7 +19,8 @@ Sort the instruments by increasing maturity. We can find a unique constant forwa
 over the tenor of the first instrument that reprices it: \(p^0 = \sum_j c_j^0 e^{-u_j^0 f_0}\).
 
 Similarly, we can find a unique constant forward rate, \(f_1\), over the maturity of the first instrument
-to the maturity of the second instrument that reprices it. Continuing in this manner constructs a
+to the maturity of the second instrument that reprices it. The price of the first instrument will not
+be effected by the value of \(f_1\). Continuing in this manner constructs a
 piecewise constant forward curve that reprices all instruments.
 
 ### Remarks
@@ -38,35 +39,41 @@ times, \(t_i\), forwards, \(f_i\), and an extrapolation value \(_f\).
 We define \(f(t) = f_i\) if \(t_{i-1} < t \le t_i_\), \(0 < i < n\), and \(f(t) = _f\) if \(t > t_{n-1}\).
 The curve is not defined for \(t < 0\).
 
-The function `value` calculates the value of a forward curve as described above.
+The function `fms::pwflat::value` calculates the value of a forward curve as described above.
 It returns not-a-number (NaN) when the curve is not defined.
 The function `integral` computes the integral of a piecewise constant curve.
 The functons `discount` and `spot` are defined in terms of these.
 Note how only `value` and `integral` do error checking and return NaN's
 instead of throwing exceptions. The other functions return NaN's on error.
 
-## `fms_curve.h`
-
-The struct `curve` collects the size, time pointer, forward pointer, and the extrapolation constant.
-It provides equality tests, allows curves to be used as function objects, and provides
-the `last` time point in the curve before extrapolation kicks in.
-
-The class `vector_curve` is a value type and provides `push_back` to add points past the end of the curve.
-
-## `fms_instrument.h`
-
-The struct `instrument` collects the size, time pointer, and cash flow pointer.
-It provides equality tests an provides the `last` maturity.
-
-The class `vector_instrument` is an `instrument` that is a value type.
-
-The class `bond` is a `vector_instrument` that models simple, periodic bonds and allows for short first coupons.
+This file also provids `present_value` and `duration` for valuing an instrument
+and computing the derivative with respect to a parallel shift of the forward curve.
 
 ## `fms_bootstrap.h`
 
-This file defines `present_value` and `duration` in the `fms::pwflat` namespace that can be called using `instruments` and `curves`.
-In the `fms::bootstrap` namespace the function `next` returns the next forward rate that will reprice the
-given `instrument` using the curve that has been built up to that point.
+Using functions from `fms_pwflat.h`, the function `fms::bootstrap::next` returns the next forward rate that will reprice the
+given instrument using the curve that has been built up to that point.
+
+## `fms_curve.h`
+
+The struct `fms::pwflat::curve` collects the size, time pointer, forward pointer, and the extrapolation constant.
+It provides equality tests, allows curves to be used as function objects, and provides
+the `last` time point in the curve before extrapolation kicks in. The user is responsible for the
+memory being pointed at. This makes it possible to avoid copying preexisting memory.
+
+The class `vector_curve` is `curve` that is a value type. It provides `push_back` to add points past the end of the curve.
+If the point is not past the last value then an exception is thrown, unlike the routines in
+`fms_pwflat.h` that return NaNs. It stores copies of the times and forwards in `std::vector`s.
+
+## `fms_instrument.h`
+
+The struct `fms::instrument` collects the size, time pointer, and cash flow pointer.
+It provides equality tests an provides the `last` maturity. The user is responsible for the
+meemory being pointed at.
+
+The class `vector_instrument` is an `instrument` that is a value type. TODO: add `insert` to insert time, cash flow pairs.
+
+The class `bond` is a `vector_instrument` that models simple, periodic bonds and allows for short first coupons.
 
 ## `fms_forward.h`
 

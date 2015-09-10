@@ -86,6 +86,30 @@ namespace pwflat {
 		return u < t[0] ? f[0] : integral(u, n, t, f, _f)/u;
 	}
 
+	// value of instrument having cash flow c[i] at time u[i]
+	template<class T, class F>
+	inline F present_value(size_t m, const T* u, const F* c, size_t n, const T* t, const F* f, const F& _f = std::numeric_limits<F>::quiet_NaN())
+	{
+		F p{0};
+
+		for (size_t i = 0; i < m; ++i)
+			p += c[i]*pwflat::discount(u[i], n, t, f, _f);
+
+		return p;
+	}
+
+	// derivative of present value wrt parallels shift of forward curve
+	template<class T, class F>
+	inline F duration(size_t m, const T* u, const F* c, size_t n, const T* t, const F* f, const F& _f = std::numeric_limits<F>::quiet_NaN())
+	{
+		F d{0};
+
+		for (size_t i = 0; i < m; ++i) {
+			d -= u[i]*c[i]*pwflat::discount(u[i], n, t, f, _f);
+		}
+
+		return d;
+	}
 } // pwflat
 } // fms
 
@@ -151,10 +175,13 @@ inline void test_fms_pwflat()
 		assert (.1 + .2 + .3 != .6); //!!!
 	}
 	{ // discount
-	  //!!! add tests
+		//!!! add tests
 	}
 	{ // spot
-	  //!!! add tests
+		//!!! add tests
+	}
+	{ // present_value
+		// !!! add tests
 	}
 }
 

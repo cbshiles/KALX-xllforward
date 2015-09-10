@@ -13,6 +13,8 @@ namespace fms {
 		const U* u; // times
 		const C* c; // cash flows
 
+		// construct with instrument<U,C>{m,u,c}
+
 		bool operator==(const instrument& i) const
 		{
 			return m == i.m 
@@ -41,6 +43,7 @@ namespace fms {
 		vector_instrument(size_t m = 0)
 			: instrument<U,C>(instrument<U,C>{m}), u_(m), c_(m)
 		{
+			// this must occur after u_, c_ created
 			u = u_.data();
 			c = c_.data();
 		}
@@ -49,6 +52,12 @@ namespace fms {
 		{
 			u = u_.data();
 			c = c_.data();
+		}
+		vector_instrument(const std::vector<U>& u, const std::vector<C>& c)
+			: vector_instrument(u.size(), u.data(), c.data())
+		{
+			if (u_.size() != c_.size())
+				throw std::runtime_error(__FILE__ ": " __FUNCTION__ ": cash flow times must equal the number of cash flows");
 		}
 
 		// insert(U, C) ...
@@ -85,6 +94,12 @@ namespace fms {
 inline void test_fms_instrument()
 {
 	using namespace fms;
+
+	{ //!!!test fms::instrument
+	}
+
+	{ //!!!test fms::vector_instrument
+	}
 
 	{
 		bond<> b(3, SEMIANNUAL, 0.05);
