@@ -32,7 +32,7 @@ Since the bootstrap method leaves the curve to from 0 to the previous maturity f
 or require extreme forward rates to reprice the next instrument. It is a good idea to keep successive
 maturities well spaced and be sure the prices you use are actually traded in the market.
 
-## `fms_pwflat.h`
+## [`fms_pwflat.h`](http://xllforward.codeplex.com/SourceControl/latest#fms_pwflat.h)
 
 We use forward curves that are piecewise constant. They are specified by
 times, \(t_i\), forwards, \(f_i\), and an extrapolation value \(_f\).
@@ -49,12 +49,12 @@ instead of throwing exceptions. The other functions return NaN's on error.
 This file also provids `present_value` and `duration` for valuing an instrument
 and computing the derivative with respect to a parallel shift of the forward curve.
 
-## `fms_bootstrap.h`
+## [`fms_bootstrap.h`](http://xllforward.codeplex.com/SourceControl/latest#fms_bootstrap.h)
 
 Using functions from `fms_pwflat.h`, the function `fms::bootstrap::next` returns the next forward rate that will reprice the
 given instrument using the curve that has been built up to that point.
 
-## `fms_curve.h`
+## [`fms_curve.h`](http://xllforward.codeplex.com/SourceControl/latest#fms_curve.h)
 
 The struct `fms::pwflat::curve` collects the size, time pointer, forward pointer, and the extrapolation constant.
 It provides equality tests, allows curves to be used as function objects, and provides
@@ -65,7 +65,7 @@ The class `vector_curve` is `curve` that is a value type. It provides `push_back
 If the point is not past the last value then an exception is thrown, unlike the routines in
 `fms_pwflat.h` that return NaNs. It stores copies of the times and forwards in `std::vector`s.
 
-## `fms_instrument.h`
+## [`fms_instrument.h`](http://xllforward.codeplex.com/SourceControl/latest#fms_instrument.h)
 
 The struct `fms::instrument` collects the size, time pointer, and cash flow pointer.
 It provides equality tests an provides the `last` maturity. The user is responsible for the
@@ -75,7 +75,7 @@ The class `vector_instrument` is an `instrument` that is a value type. TODO: add
 
 The class `bond` is a `vector_instrument` that models simple, periodic bonds and allows for short first coupons.
 
-## `fms_forward.h`
+## [`fms_forward.h`](http://xllforward.codeplex.com/SourceControl/latest#fms_forward.h)
 
 The `fms::pwflat::forward` class allows you bootstrap forward curves using instruments. Instantiate
 a foward curve, then call `next(i,p)` with a instruments of increasing maturity and their prices.
