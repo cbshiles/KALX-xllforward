@@ -7,66 +7,38 @@ namespace fms {
 namespace pwflat {
 
 	template<class T = double, class F = double>
-	class forward {
-		std::vector<T> t;
-		std::vector<F> f;
+	class forward : public vector_curve<T,F> {
 	public:
 		forward(size_t n = 0, const T* t = nullptr, const F* f = nullptr)
-			: t(t, t + n), f(f, f + n)
+			: vector_curve<T,F>(n, t, f)
 		{ }
 		forward(const std::vector<T>& t, const std::vector<F>& f)
-			: t(t), f(f)
+			: vector_curve<T,F>(t, f)
 		{
 			if (t.size() != f.size())
 				throw std::runtime_error(__FILE__ ": " __FUNCTION__ ": times and forwards must be the same size");
 		}
-
-		const curve<T,F>& curve() const
-		{
-			return curve<T,F>(t.size(), t.data(), f.data());
-		}
-
-		bool operator==(const forward& c) const
-		{
-			return t == c.t && f == c.f;
-		}
-		bool operator!=(const forward& c) const
-		{
-			return !operator==(c);
-		}
-
-		size_t size() const
-		{
-			return t.size();
-		}
-
 		F value(const T& u) const
 		{
-			return value(u, size(), t.data(), f.data());
-		}
-		// function object
-		F operator()(const T& u) const
-		{
-			return value(u);
+			return value(u, n, t, f);
 		}
 
 		F spot(const T& u) const
 		{
-			return spot(u, size(), t.data(), f.data());
+			return spot(u, n, t, f);
 		}
 
 		F discount(const T& u) const
 		{
-			return discount(u, size(), t.data(), f.data());
+			return discount(u, n, t, f);
 		}
 
 		// extend curve
-		forward& next(const instrument<T,F> i, F p = 0, F _f = 0)
+		forward& next(const instrument<T,F>& i, F p = 0, F e = 0)
 		{
-			_f = bootstrap::next(i, curve(), p, _f);
+			e = bootstrap::next(i, *this, p, e);
 
-			t.push_back(i.last());
-			f.push_back(_f);
+			push_back(i.last(), e);			
 
 			return *this;
 		}
@@ -80,25 +52,27 @@ namespace pwflat {
 
 inline void test_fms_pwflat_forward()
 {
+	using namespace fms;
+
 	{
 		// test default constructor
-		fms::pwflat::forward<> f;
+		pwflat::forward<> f;
 
-		assert (f.size() == 0);
+		assert (f.n == 0);
 		// test default copy constructor
 		auto f1 = f;
-		assert (f.size() == 0);
+		assert (f.n == 0);
 		// test default assignment
 		f = f1;
-		assert (f.size() == 0);
+		assert (f.n == 0);
 	}
 	{
 		// test array constructor
 		int t[] = {1,2,3};
 		double f[] = {.1,.2,.3};
-		fms::pwflat::forward<int,double> c(3,t,f);
+		pwflat::forward<int,double> c(3,t,f);
 
-		assert (c.size() == 3);
+		assert (c.n == 3);
 		auto c1(c);
 		c = c1;
 		assert (c == c1);
@@ -108,13 +82,27 @@ inline void test_fms_pwflat_forward()
 		// test vector constructor
 		std::vector<int> t{1,2,3};
 		std::vector<double> f{.1,.2,.3};
-		fms::pwflat::forward<int,double> c(t,f);
+		pwflat::forward<int,double> c(t,f);
 
-		assert (c.size() == 3);
+		assert (c.n == 3);
 		auto c1(c);
 		c = c1;
 		assert (c == c1);
 		assert (!(c != c1));
+	}
+	{
+		pwflat::forward<> f;
+
+		double t[] = {1,2,3,5,7,10};
+		double c = 0.05;
+		for (const auto ti : t) {
+			f.next(bond<>(ti, SEMIANNUAL, c), 1);
+		}
+		for (const auto ti : t) {
+			auto b = bond<>(ti, SEMIANNUAL, c);
+			double pv = pwflat::present_value(b, f);
+			assert (fabs(pv - 1) < std::numeric_limits<double>::epsilon());
+		}
 	}
 }
 

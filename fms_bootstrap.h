@@ -64,30 +64,30 @@ namespace bootstrap {
 
 		// present values of cash flows to curve end
 		auto m0 = ui - u;
-		F p0 = present_value(m0, u, c, n, t, f);
+		F p0 = pwflat::present_value(m0, u, c, n, t, f);
 
 		// skip cash flows to curve end
 		m -= m0;
 		u += m0;
 		c += m0;
 
-		auto f = [p,p0,m,u,c,n,t,f](F _f) {
-			return -p + p0 + present_value(m, u, c, n, t, f, _f);
+		auto pv = [p,p0,m,u,c,n,t,f](F _f) {
+			return -p + p0 + pwflat::present_value(m, u, c, n, t, f, _f);
 		};
-		auto df = [m,u,c,n,t,f](F _f) {
-			return duration(m, u, c, n, t, f, _f);
+		auto dur = [m,u,c,n,t,f](F _f) {
+			return pwflat::duration(m, u, c, n, t, f, _f);
 		};
 
 		// initial bootstrap guess
-		if (_f = 0)
+		if (_f == 0)
 			_f = n > 0 ? f[n - 1] : F(.01);
 
-		return newton::root(_f, f, df);
+		return newton::root<F,F>(_f, pv, dur);
 	}
 	template<class T, class F>
 	inline F next(const instrument<T,F>& i, const curve<T,F>& c, F p = 0, F _f = 0)
 	{
-		return next(i.m, i.u, i.c, c.n, c.t, c._f, p, _f);
+		return next<T,F>(i.m, i.u, i.c, c.n, c.t, c.f, p, _f);
 	}
 
 } // bootstrap

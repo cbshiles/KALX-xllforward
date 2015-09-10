@@ -14,11 +14,12 @@ namespace fms {
 		MONTHLY = 12
 	};
 
-	template<class T = double, class F = double>
+	// NOT a value type
+	template<class U = double, class C = double>
 	struct instrument {
 		size_t m;
-		const T* u; // times
-		const F* c; // cash flows
+		const U* u; // times
+		const C* c; // cash flows
 
 		bool operator==(const instrument& i) const
 		{
@@ -32,30 +33,46 @@ namespace fms {
 		}
 
 		// Time of last cash flow. AKA maturity, termination
-		T last() const
+		U last() const
 		{
-			return m > 0 ? u[m-1] : std::numeric_limits<T>::quiet_NaN();
+			return m > 0 ? u[m-1] : std::numeric_limits<U>::quiet_NaN();
 		}
 	};
 
-	template<class T = double, class F = double>
-	struct bond : public instrument<T,F> {
-		std::vector<T> u;
-		std::vector<F> c;
+	template<class U = double, class C = double>
+	class vector_instrument : public instrument<U,C> {
+	protected:
+		std::vector<U> u_;
+		std::vector<C> c_;
 	public:
-		bond(T maturity = 0, frequency freq = NONE, F coupon = 0)
-			: instrument{static_cast<size_t>(ceil(freq*maturity))}, u(m), c(m)
+		vector_instrument(size_t m = 0)
+			: instrument<U,C>(instrument<U,C>{m}), u_(m), c_(m)
 		{
-			instrument<T,F>::u = u.data();
-			instrument<T,F>::c = c.data();
-
-			// fill backwards from maturity
-			T i = 0;
-			std::generate(u.rbegin(), u.rend(), [&]() { return maturity - i++/freq; });
-			std::fill(c.begin(), c.end(), coupon);
-			c.back() += 1; // standard notional
+			u = u_.data();
+			c = c_.data();
+		}
+		vector_instrument(size_t m, const U* u, const C* c)
+			: instrument<U,C>(instrument<U,C>{m}), u_(u, u + n), c_(c, c + n)
+		{
+			u = u_.data();
+			c = c_.data();
 		}
 
+		// insert(U, C) ...
+	};
+
+	template<class U = double, class C = double>
+	struct bond : public vector_instrument<U,C> {
+		bond(U maturity = 0, frequency freq = NONE, C coupon = 0)
+			: vector_instrument{static_cast<size_t>(ceil(freq*maturity))}
+		{
+			// fill backwards from maturity
+			U i = 0;
+			std::generate(u_.rbegin(), u_.rend(), [&]() { return maturity - i++/freq; });
+			std::fill(c_.begin(), c_.end(), coupon/freq);
+
+			c_.back() += 1; // plus unit notional at maturity
+		}
 	};
 
 } // fms
@@ -72,7 +89,7 @@ inline void test_fms_instrument()
 		assert (b.m == 6);
 		for (size_t i = 0; i < b.m; ++i) {
 			assert (b.u[i] == 0.5 + 1.*i/SEMIANNUAL);
-			assert (b.c[i] == (i < b.m - 1 ? 0.05 : 1.05));
+			assert (b.c[i] == (i < b.m - 1 ? 0.05/2 : 1 + .05/2));
 		}
 	}
 	{ // short first coupon
@@ -80,7 +97,7 @@ inline void test_fms_instrument()
 		assert (b.m == 7);
 		for (size_t i = 0; i < b.m; ++i) {
 			assert (b.u[i] == 0.25 + 1.*i/SEMIANNUAL);
-			assert (b.c[i] == (i < b.m - 1 ? 0.05 : 1.05));
+			assert (b.c[i] == (i < b.m - 1 ? 0.05/2 : 1 + .05/2));
 		}
 	}
 	{
