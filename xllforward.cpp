@@ -3,6 +3,8 @@
 
 using namespace xll;
 
+
+
 #ifdef _DEBUG
 
 XLL_TEST_BEGIN(xll_forward_test)

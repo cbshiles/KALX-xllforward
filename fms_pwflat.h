@@ -98,7 +98,7 @@ namespace pwflat {
 		return p;
 	}
 
-	// derivative of present value wrt parallels shift of forward curve
+	// derivative of present value wrt parallel shift of forward curve
 	template<class T, class F>
 	inline F duration(size_t m, const T* u, const F* c, size_t n, const T* t, const F* f, const F& _f = std::numeric_limits<F>::quiet_NaN())
 	{
