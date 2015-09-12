@@ -23,7 +23,7 @@ HANDLEX WINAPI xll_pwflat_forward(xfpx* pt, xfpx* pf, double _f)
 
 		if (_f == 0)
 			_f = std::numeric_limits<double>::quiet_NaN();
-		handle<fms::pwflat::vector_curve<>> h_{new fms::pwflat::vector_curve<>(size(*pt), pt->array, pf->array, _f)};
+		handle<fms::pwflat::forward<>> h_{new fms::pwflat::forward<>(size(*pt), pt->array, pf->array, _f)};
 
 		h = h_.get();
 	}
@@ -47,7 +47,7 @@ xfpx* WINAPI xll_pwflat_forward_times(HANDLEX h)
 	static FPX t;
 
 	try {
-		handle<fms::pwflat::vector_curve<>> h_(h);
+		handle<fms::pwflat::forward<>> h_(h);
 
 		t.resize(1, static_cast<xword>(h_->n));
 		std::copy(h_->t, h_->t + h_->n, t.begin());
@@ -74,7 +74,7 @@ xfpx* WINAPI xll_pwflat_forward_values(HANDLEX h)
 	static FPX f;
 
 	try {
-		handle<fms::pwflat::vector_curve<>> h_(h);
+		handle<fms::pwflat::forward<>> h_(h);
 
 		f.resize(1, static_cast<xword>(h_->n));
 		std::copy(h_->f, h_->f + h_->n, f.begin());
@@ -102,7 +102,7 @@ xfpx* WINAPI xll_pwflat_forward_integral(HANDLEX h, xfpx* pt)
 	static FPX f;
 
 	try {
-		handle<fms::pwflat::vector_curve<>> h_(h);
+		handle<fms::pwflat::forward<>> h_(h);
 
 		f.resize(pt->rows, pt->columns);
 		std::transform(begin(*pt), end(*pt), f.begin(), [h_](double t) { return h_->integral(t); });
@@ -130,10 +130,38 @@ xfpx* WINAPI xll_pwflat_forward_spot(HANDLEX h, xfpx* pt)
 	static FPX f;
 
 	try {
-		handle<fms::pwflat::vector_curve<>> h_(h);
+		handle<fms::pwflat::forward<>> h_(h);
 
 		f.resize(pt->rows, pt->columns);
 		std::transform(begin(*pt), end(*pt), f.begin(), [h_](double t) { return h_->spot(t); });
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0;
+	}
+
+	return f.get();
+}
+
+static AddInX xai_pwflat_forward_discount(
+	FunctionX(XLL_FPX, _T("?xll_pwflat_forward_discount"), _T("XLL.PWFLAT.FORWARD.DISCOUNT"))
+	.Arg(XLL_HANDLEX, _T("Curve"), _T("is a handle to a XLL.PWFLAT.FORWARD curve."))
+	.Arg(XLL_FPX, _T("Times"), _T("is one or more times at which to evaluate the discount value."))
+	.FunctionHelp(_T("Returns the discount values of a curve."))
+	.Category(_T("XLL"))
+	.Documentation(_T(""))
+	);
+xfpx* WINAPI xll_pwflat_forward_discount(HANDLEX h, xfpx* pt)
+{
+#pragma XLLEXPORT
+	static FPX f;
+
+	try {
+		handle<fms::pwflat::forward<>> h_(h);
+
+		f.resize(pt->rows, pt->columns);
+		std::transform(begin(*pt), end(*pt), f.begin(), [h_](double t) { return h_->discount(t); });
 	}
 	catch (const std::exception& ex) {
 		XLL_ERROR(ex.what());

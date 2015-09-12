@@ -30,11 +30,11 @@ namespace pwflat {
 	template<class T = double, class F = double>
 	class forward : public vector_curve<T,F> {
 	public:
-		forward(size_t n = 0, const T* t = nullptr, const F* f = nullptr)
-			: vector_curve<T,F>(n, t, f)
+		forward(size_t n = 0, const T* t = nullptr, const F* f = nullptr, const F& _f = std::numeric_limits<F>::quiet_NaN())
+			: vector_curve<T,F>(n, t, f, _f)
 		{ }
-		forward(const std::vector<T>& t, const std::vector<F>& f)
-			: vector_curve<T,F>(t, f)
+		forward(const std::vector<T>& t, const std::vector<F>& f, const F& _f = std::numeric_limits<F>::quiet_NaN())
+			: vector_curve<T,F>(t, f, _f)
 		{
 			if (t.size() != f.size())
 				throw std::runtime_error(__FILE__ ": " __FUNCTION__ ": times and forwards must be the same size");
