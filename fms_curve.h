@@ -34,13 +34,17 @@ namespace pwflat {
 		{
 			return pwflat::value(u, n, t, f, _f);
 		}
+		F integral(const T& u) const
+		{
+			return pwflat::integral(u, n,t,f);
+		}
 		F spot(const T& u) const
 		{
-			return spot(u, n,t,f);
+			return pwflat::spot(u, n,t,f);
 		}
 		F discount(const T& u) const
 		{
-			return discount(u, n,t,f);
+			return pwflat::discount(u, n,t,f);
 		}
 
 		// last maturity in curve
