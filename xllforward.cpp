@@ -3,7 +3,118 @@
 
 using namespace xll;
 
+static AddInX xai_pwflat_forward(
+	FunctionX(XLL_HANDLEX, _T("?xll_pwflat_forward"), _T("XLL.PWFLAT.FORWARD"))
+	.Arg(XLL_FPX, _T("times"), _T("is an array of increasing times."))
+	.Arg(XLL_FPX, _T("forwards"), _T("is an array of forward values."))
+	.Arg(XLL_DOUBLEX, _T("_extrapolate"), _T("is an optional forward value for extrapolating past the last time. Default is 0."))
+	.Uncalced()
+	.FunctionHelp(_T("Return a handle to a piecewise flat forward curve."))
+	.Category(_T("XLL"))
+	.Documentation(_T(""))
+);
+HANDLEX WINAPI xll_pwflat_forward(xfpx* pt, xfpx* pf, double _f)
+{
+#pragma XLLEXPORT
+	handlex h;
 
+	try {
+		ensure (size(*pt) == size(*pf));
+
+		if (_f == 0)
+			_f = std::numeric_limits<double>::quiet_NaN();
+		handle<fms::pwflat::vector_curve<>> h_{new fms::pwflat::vector_curve<>(size(*pt), pt->array, pf->array, _f)};
+
+		h = h_.get();
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+	}
+
+	return h;
+}
+
+static AddInX xai_pwflat_forward_times(
+	FunctionX(XLL_FPX, _T("?xll_pwflat_forward_times"), _T("XLL.PWFLAT.FORWARD.TIMES"))
+	.Arg(XLL_HANDLEX, _T("Curve"), _T("is a handle to a XLL.PWFLAT.FORWARD curve."))
+	.FunctionHelp(_T("Returns the times of a curve."))
+	.Category(_T("XLL"))
+	.Documentation(_T(""))
+);
+xfpx* WINAPI xll_pwflat_forward_times(HANDLEX h)
+{
+#pragma XLLEXPORT
+	static FPX t;
+
+	try {
+		handle<fms::pwflat::vector_curve<>> h_(h);
+
+		t.resize(1, static_cast<xword>(h_->n));
+		std::copy(h_->t, h_->t + h_->n, t.begin());
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0;
+	}
+
+	return t.get();
+}
+
+static AddInX xai_pwflat_forward_values(
+	FunctionX(XLL_FPX, _T("?xll_pwflat_forward_values"), _T("XLL.PWFLAT.FORWARD.VALUES"))
+	.Arg(XLL_HANDLEX, _T("Curve"), _T("is a handle to a XLL.PWFLAT.FORWARD curve."))
+	.FunctionHelp(_T("Returns the forward values of a curve."))
+	.Category(_T("XLL"))
+	.Documentation(_T(""))
+);
+xfpx* WINAPI xll_pwflat_forward_values(HANDLEX h)
+{
+#pragma XLLEXPORT
+	static FPX f;
+
+	try {
+		handle<fms::pwflat::vector_curve<>> h_(h);
+
+		f.resize(1, static_cast<xword>(h_->n));
+		std::copy(h_->f, h_->f + h_->n, f.begin());
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0;
+	}
+
+	return f.get();
+}
+
+static AddInX xai_pwflat_forward_value(
+	FunctionX(XLL_FPX, _T("?xll_pwflat_forward_value"), _T("XLL.PWFLAT.FORWARD.VALUE"))
+	.Arg(XLL_HANDLEX, _T("Curve"), _T("is a handle to a XLL.PWFLAT.FORWARD curve."))
+	.Arg(XLL_FPX, _T("Times"), _T("is one or more times at which to value the curve."))
+	.FunctionHelp(_T("Returns the forward values of a curve."))
+	.Category(_T("XLL"))
+	.Documentation(_T(""))
+);
+xfpx* WINAPI xll_pwflat_forward_value(HANDLEX h, xfpx* pt)
+{
+#pragma XLLEXPORT
+	static FPX f;
+
+	try {
+		handle<fms::pwflat::vector_curve<>> h_(h);
+
+		f.resize(pt->rows, pt->columns);
+		std::transform(begin(*pt), end(*pt), f.begin(), [h_](double t) { return (*h_)(t); });
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0;
+	}
+
+	return f.get();
+}
 
 #ifdef _DEBUG
 

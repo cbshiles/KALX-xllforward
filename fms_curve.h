@@ -63,14 +63,14 @@ namespace pwflat {
 			t = t_.data();
 			f = f_.data();
 		}
-		vector_curve(size_t n, const T* t, const F* f)
-			: curve<T,F>(n), t_(t, t + n), f_(f, f + n)
+		vector_curve(size_t n, const T* t, const F* f, double _f = std::numeric_limits<F>::quiet_NaN())
+			: curve<T,F>(n, 0, 0, _f), t_(t, t + n), f_(f, f + n)
 		{
 			curve<T,F>::t = t_.data();
 			curve<T,F>::f = f_.data();
 		}
-		vector_curve(const std::vector<T>& t, const std::vector<F>& f)
-			: curve<T,F>(t.size()), t_(t), f_(f)
+		vector_curve(const std::vector<T>& t, const std::vector<F>& f, double _f = std::numeric_limits<F>::quiet_NaN())
+			: curve<T,F>(t.size(), 0, 0, _f), t_(t), f_(f)
 		{
 			if (t.size() != f.size())
 				throw std::runtime_error(__FILE__ ": " __FUNCTION__ "time and forward vector must be the same size");
