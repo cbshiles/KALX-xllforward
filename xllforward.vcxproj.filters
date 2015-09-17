@@ -41,6 +41,9 @@
     <ClCompile Include="xllforward.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="xllinstrument.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

@@ -18,6 +18,8 @@ namespace pwflat {
 		curve(size_t n = 0, const T* t = nullptr, const F* f = nullptr, const F& _f = std::numeric_limits<F>::quiet_NaN())
 			: n(n), t(t), f(f), _f(_f)
 		{ }
+		virtual ~curve()
+		{ }
 		
 		bool operator==(const curve& c) const
 		{
@@ -82,6 +84,25 @@ namespace pwflat {
 			curve<T,F>::t = t_.data();
 			curve<T,F>::f = f_.data();
 		}
+		vector_curve(const vector_curve& c)
+			: vector_curve<T,F>(c.t_, c.f_, c._f)
+		{ }
+		vector_curve& operator=(const vector_curve& c)
+		{
+			if (this != &c) {
+				t_ = c.t_;
+				f_ = c.f_;
+
+				n = c.n;
+				t = t_.data();
+				f = f_.data();
+				_f = c._f;
+			}
+
+			return *this;
+		}
+		virtual ~vector_curve()
+		{ }
 
 		// extend using a time and forward value
 		vector_curve& push_back(const T& u, const F& g)
@@ -124,28 +145,54 @@ inline void test_fms_curve()
 		double t[] = {1,2,3};
 		double f[] = {.1,.2,.3};
 
-		pwflat::curve<> c0(3,t,f);
-		pwflat::vector_curve<> c1(std::vector<double>(std::begin(t),std::end(t)), std::vector<double>(std::begin(f),std::end(f)));
+		pwflat::curve<> c0(3, t, f);
+		pwflat::vector_curve<> c1(std::vector<double>(std::begin(t), std::end(t)), std::vector<double>(std::begin(f), std::end(f)));
+
 		//!!! add more tests, e.g is c0 == c1? do copy constructor/assignment work?
+		assert(c0 == c1);
+
+		pwflat::curve<> c2(c0);
+		assert(c2 == c0);
+		c0 = c2;
+		assert(c2 == c0);
+
+		pwflat::vector_curve<> c3(c1);
+		assert(c3 == c1);
+		c1 = c3;
+		assert(c3 == c1);
 	}
 	{ //!!! test operator(), spot, discount
+		double t[] = { 1,2,3 };
+		double f[] = { .1,.2,.3 };
+		pwflat::vector_curve<> c(3, t, f);
+		assert(0.1 == c(1));
+		assert(0.2 == c(2));
+		assert(0.3 == c(3));
+
+		assert(0.1 / 1.0 == c.spot(1));
+		assert((0.1 + 0.2) / 2.0 == c.spot(2));
+		assert((0.1 + 0.2 + 0.3) / 3.0 == c.spot(3));
+
+		assert(exp(-0.1) == c.discount(1));
+		assert(exp(-0.1 - 0.2) == c.discount(2));
+		assert(exp(-0.1 - 0.2 - 0.3) == c.discount(3));
 	}
 	{
-		pwflat::vector_curve<> c(std::vector<double>{1,2,3}, std::vector<double>{.1,.2,.3});
+		pwflat::vector_curve<> c(std::vector<double>{1, 2, 3}, std::vector<double>{.1, .2, .3});
 		auto c2 = c;
-		assert (c2 == c);
-		assert (c.n == 3);
-		assert (c.t[0] == 1);
-		assert (c.f[2] == .3);
+		assert(c2 == c);
+		assert(c.n == 3);
+		assert(c.t[0] == 1);
+		assert(c.f[2] == .3);
 
 		pwflat::vector_curve<> c3;
-		assert (c3.n == 0);
+		assert(c3.n == 0);
 		c3.push_back(c.t[0], c.f[0]);
-		assert (c3.n == 1);
+		assert(c3.n == 1);
 		c3.push_back(c.t[1], c.f[1]);
 		c3.push_back(c.t[2], c.f[2]);
 
-		assert (c3 == c);
+		assert(c3 == c);
 	}
 }
 

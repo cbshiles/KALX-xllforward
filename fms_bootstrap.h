@@ -101,9 +101,9 @@ inline void test_fms_bootstrap()
 		// 1 = c2[0]*D(t[0]) + c2[1]*D(t[1]) + c2[2]*D(t[2])
 		c2[0] = c1[0];
 		c2[1] = c1[1];
-		c2[2] = 0; //!!! replace with appropriate value
+		c2[2] = (1 - c2[0]*exp(-t[0]*f0)-c2[1]*exp(-t[1]*f0))/exp(-t[2]*f0); //!!! replace with appropriate value
 		f[2] = bootstrap::next<double,double>(3,t,c2, 2,t,f, 1);
-//		assert (fabs(f[2] - f0) < eps); //!!! uncomment this line
+		assert (fabs(f[2] - f0) < eps);
 	}
 }
 

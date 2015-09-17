@@ -13,7 +13,13 @@ namespace fms {
 		const U* u; // times
 		const C* c; // cash flows
 
-		// construct with instrument<U,C>{m,u,c}
+		instrument(size_t m = 0, const U* u = nullptr, const C* c = nullptr)
+			: m(m), u(u), c(c)
+		{ }
+		instrument(const instrument&) = delete;
+		instrument& operator=(const instrument&) = delete;
+		virtual ~instrument()
+		{ }
 
 		bool operator==(const instrument& i) const
 		{
@@ -41,24 +47,41 @@ namespace fms {
 		std::vector<C> c_;
 	public:
 		vector_instrument(size_t m = 0)
-			: instrument<U,C>(instrument<U,C>{m}), u_(m), c_(m)
+			: instrument<U,C>(m), u_(m), c_(m)
 		{
 			// this must occur after u_, c_ created
-			u = u_.data();
-			c = c_.data();
+			instrument<U,C>::u = u_.data();
+			instrument<U,C>::c = c_.data();
 		}
 		vector_instrument(size_t m, const U* u, const C* c)
-			: instrument<U,C>(instrument<U,C>{m}), u_(u, u + n), c_(c, c + n)
+			: instrument<U,C>(m), u_(u, u + m), c_(c, c + m)
 		{
-			u = u_.data();
-			c = c_.data();
+			instrument<U,C>::u = u_.data();
+			instrument<U,C>::c = c_.data();
 		}
 		vector_instrument(const std::vector<U>& u, const std::vector<C>& c)
 			: vector_instrument(u.size(), u.data(), c.data())
 		{
 			if (u_.size() != c_.size())
 				throw std::runtime_error(__FILE__ ": " __FUNCTION__ ": cash flow times must equal the number of cash flows");
+
+			instrument<U,C>::u = u_.data();
+			instrument<U,C>::c = c_.data();
 		}
+		vector_instrument(const vector_instrument& i)
+			: vector_instrument(i.u_, i.c_)
+		{ }
+		vector_instrument& operator=(const vector_instrument& i)
+		{
+			if (this != &i) {
+				u_ = i.u_;
+				c_ = i.c_;
+			}
+
+			return *this;
+		}
+		virtual ~vector_instrument()
+		{ }
 
 		// insert(U, C) ...
 	};
@@ -75,7 +98,7 @@ namespace fms {
 	template<class U = double, class C = double>
 	struct bond : public vector_instrument<U,C> {
 		bond(U maturity = 0, frequency freq = NONE, C coupon = 0)
-			: vector_instrument{static_cast<size_t>(ceil(freq*maturity))}
+			: vector_instrument(static_cast<size_t>(ceil(freq*maturity)))
 		{
 			// fill backwards from maturity
 			U i = 0;

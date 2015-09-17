@@ -4,3 +4,4 @@
 #include "fms_forward.h"
 #include "../xll8/xll/xll.h"
 
+#define CATEGORY _T("XLL")

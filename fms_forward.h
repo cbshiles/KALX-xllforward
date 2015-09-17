@@ -39,6 +39,19 @@ namespace pwflat {
 			if (t.size() != f.size())
 				throw std::runtime_error(__FILE__ ": " __FUNCTION__ ": times and forwards must be the same size");
 		}
+		forward(const forward& f)
+			: forward(f.t_, f.f_, f._f)
+		{ }
+		forward& operator=(const forward& g)
+		{
+			if (this != &g) {
+				vector_curve<T,F>::operator=(g);
+			}
+
+			return *this;
+		}
+		~forward()
+		{ }
 
 		// operator(), spot, discount inherited from curve
 
@@ -58,7 +71,10 @@ namespace pwflat {
 
 #ifdef _DEBUG
 #include <cassert>
-#include <random>
+#include <algorithm>
+#include <numeric>
+#include <vector>
+#include <string>
 
 inline void test_fms_forward()
 {
@@ -125,18 +141,25 @@ inline void test_fms_forward()
 		// bond maturities
 		double t[] = {1,2,3,5,7,10};
 		double c = 0.05;
-		for (const auto ti : t) {
-			// semiannual par bond
-			double dc = u(dre);
-			f.next(bond<>(ti, SEMIANNUAL, c + dc), 1);
+
+		std::vector<double> rc;
+		for (int i = 0; i < sizeof(t) / sizeof(*t); i++) {
+			rc.push_back(u(dre) + c);
 		}
+
+		for (int i = 0; i < sizeof(t) / sizeof(*t); i++) {
+			// semiannual par bond
+			f.next(bond<>(t[i], SEMIANNUAL, rc[i]), 1);
+		}
+		
 		// verify repricing
-		for (const auto ti : t) {
-			auto b = bond<>(ti, SEMIANNUAL, c);
-			double pv = pwflat::present_value(b, f);
-			pv = pv; // C4189
-			//!!! find out why this is failing !!!
-//			assert (fabs(pv - 1) < std::numeric_limits<double>::epsilon());
+		for (int i = 0; i < sizeof(t) / sizeof(*t); i++) {
+				auto b = bond<>(t[i], SEMIANNUAL, rc[i]);
+				double pv = pwflat::present_value(b, f);
+				//!!! find out why this is failing !!!
+				double x; 
+				x = pv - 1;
+				assert (fabs(x) < 10*std::numeric_limits<double>::epsilon());
 		}
 	}
 }
