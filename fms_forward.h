@@ -149,6 +149,7 @@ inline void test_fms_forward()
 
 		for (int i = 0; i < sizeof(t) / sizeof(*t); i++) {
 			// semiannual par bond
+			// !!! set breakpoint here
 			f.next(bond<>(t[i], SEMIANNUAL, rc[i]), 1);
 		}
 		

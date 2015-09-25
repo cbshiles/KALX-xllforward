@@ -33,7 +33,7 @@ namespace bootstrap {
 			return -p + p0 + pwflat::present_value(m, u, c, n, t, f, _f);
 		};
 		auto dur = [m,u,c,n,t,f](F _f) {
-			return pwflat::duration(m, u, c, n, t, f, _f);
+			return pwflat::duration_extrapolated(m, u, c, n, t, f, _f);
 		};
 
 		// initial bootstrap guess

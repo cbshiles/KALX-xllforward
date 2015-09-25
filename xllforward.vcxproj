@@ -158,6 +158,7 @@
     <ClInclude Include="fms_bootstrap.h" />
     <ClInclude Include="fms_curve.h" />
     <ClInclude Include="fms_forward.h" />
+    <ClInclude Include="fms_lmm.h" />
     <ClInclude Include="fms_pwflat.h" />
     <ClInclude Include="fms_instrument.h" />
     <ClInclude Include="newton.h" />

@@ -321,6 +321,7 @@ double WINAPI xll_pwflat_forward_duration(HANDLEX f, HANDLEX i)
 }
 
 #ifdef _DEBUG
+#include "fms_lmm.h"
 
 XLL_TEST_BEGIN(xll_forward_test)
 //_crtBreakAlloc = 2169;
@@ -331,6 +332,9 @@ XLL_TEST_BEGIN(xll_forward_test)
 	test_fms_curve();
 	test_fms_instrument();
 	test_fms_forward();
+	test_fms_pwflat_lmm();
+
+//	test_fms_lmm();
 
 XLL_TEST_END(xll_forward_test)
 

@@ -20,6 +20,7 @@
 namespace fms {
 namespace pwflat {
 
+	// strictly increasing values
 	template<class I>
 	inline bool monotonic(I b, I e)
 	{
@@ -105,6 +106,23 @@ namespace pwflat {
 		F d{0};
 
 		for (size_t i = 0; i < m; ++i) {
+			d -= u[i]*c[i]*pwflat::discount(u[i], n, t, f, _f);
+		}
+
+		return d;
+	}
+
+	// derivative of present value wrt parallel shift of forward curve after last curve time
+	template<class T, class F>
+	inline F duration_extrapolated(size_t m, const T* u, const F* c, size_t n, const T* t, const F* f, const F& _f = std::numeric_limits<F>::quiet_NaN())
+	{
+		F d{0};
+
+		// what if n == 0???
+		// what if t[n-1] is past end of cash flows???
+		// size_t i = i0 + 1 ???
+		size_t i0 = n == 0 ? 0 : std::lower_bound(u, u + m, t[n-1]) - u;
+		for (size_t i = i0; i < m; ++i) {
 			d -= u[i]*c[i]*pwflat::discount(u[i], n, t, f, _f);
 		}
 
