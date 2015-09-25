@@ -116,10 +116,10 @@ inline void test_fms_pwflat_lmm()
 //		ensure (c == c0); //!!! make this work
 
 		m.advance(1);
-		//!!! m.curve() == curve({0, 1}, {.02,.03})
+		//!!! show m.curve() == curve({0, 1}, {.02,.03})
 
 		m.advance(2);
-		//!!! m.curve() == curve({1}, {0.03})
+		//!!! show m.curve() == curve({1}, {0.03})
 	}
 }
 
