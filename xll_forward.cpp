@@ -1,5 +1,5 @@
 // xllforward.cpp - forward curves
-#include "xllforward.h"
+#include "xll_forward.h"
 
 using namespace xll;
 

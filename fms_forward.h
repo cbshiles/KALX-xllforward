@@ -130,7 +130,7 @@ inline void test_fms_forward()
 		for (const auto ti : t) {
 			auto b = bond<>(ti, SEMIANNUAL, c);
 			double pv = pwflat::present_value(b, f);
-			assert (fabs(pv - 1) < std::numeric_limits<double>::epsilon());
+			assert (fabs(pv - 1) <= std::numeric_limits<double>::epsilon());
 		}
 	}
 	{ // test with random coupons
@@ -155,12 +155,12 @@ inline void test_fms_forward()
 		
 		// verify repricing
 		for (int i = 0; i < sizeof(t) / sizeof(*t); i++) {
-				auto b = bond<>(t[i], SEMIANNUAL, rc[i]);
-				double pv = pwflat::present_value(b, f);
-				//!!! find out why this is failing !!!
-				double x; 
-				x = pv - 1;
-				assert (fabs(x) < 10*std::numeric_limits<double>::epsilon());
+			auto b = bond<>(t[i], SEMIANNUAL, rc[i]);
+			double pv = pwflat::present_value(b, f);
+			//!!! find out why this is failing !!!
+			double x; 
+			x = pv - 1;
+			assert (fabs(x) < 10*std::numeric_limits<double>::epsilon());
 		}
 	}
 }

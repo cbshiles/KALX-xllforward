@@ -1,5 +1,5 @@
 // xllinstrument.cpp - instruments
-#include "xllforward.h"
+#include "xll_forward.h"
 
 using namespace xll;
 

@@ -162,11 +162,12 @@
     <ClInclude Include="fms_pwflat.h" />
     <ClInclude Include="fms_instrument.h" />
     <ClInclude Include="newton.h" />
-    <ClInclude Include="xllforward.h" />
+    <ClInclude Include="xll_forward.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="xllforward.cpp" />
-    <ClCompile Include="xllinstrument.cpp" />
+    <ClCompile Include="xll_forward.cpp" />
+    <ClCompile Include="xll_instrument.cpp" />
+    <ClCompile Include="xll_pwflat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\xll8\xll.vcxproj">
