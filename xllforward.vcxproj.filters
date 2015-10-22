@@ -53,5 +53,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="Interest-Rate-Instruments-and-Market-Conventions.pdf" />
   </ItemGroup>
 </Project>

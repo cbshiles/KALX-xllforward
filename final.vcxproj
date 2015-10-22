@@ -151,9 +151,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bacheler.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\xll8\xll.vcxproj">
       <Project>{8b15c18c-4c25-476c-abbd-88be05c35a3e}</Project>
     </ProjectReference>
