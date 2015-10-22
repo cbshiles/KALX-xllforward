@@ -90,13 +90,13 @@ static AddInX xai_instrument_bond(
 	.Category(CATEGORY)
 	.Documentation(_T(""))
 );
-HANDLEX WINAPI xll_instrument_bond(double maturity, fms::frequency freq, double coupon)
+HANDLEX WINAPI xll_instrument_bond(double maturity, fms::instrument::frequency freq, double coupon)
 {
 #pragma XLLEXPORT
 	handlex h;
 
 	try {
-		handle<fms::vector_instrument<>> h_{new fms::bond<>(maturity, freq, coupon)};
+		handle<fms::vector_instrument<>> h_{new fms::instrument::bond<>(maturity, freq, coupon)};
 
 		h = h_.get();
 	}
@@ -106,3 +106,7 @@ HANDLEX WINAPI xll_instrument_bond(double maturity, fms::frequency freq, double 
 
 	return h;
 }
+
+// !!! implement xll_instrument_cd
+
+// !!! implement xll_instrument_fra

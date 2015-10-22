@@ -16,13 +16,13 @@ namespace pwflat {
 	}
 
 	template<class T, class F>
-	inline F present_value(const instrument<T,F>& i, const curve<T,F>& c)
+	inline F present_value(const instrument_base<T,F>& i, const curve<T,F>& c)
 	{
 		return present_value(i.m,i.u,i.c, c.n,c.t,c.f,c._f);
 	}
 
 	template<class T, class F>
-	inline F duration(const instrument<T,F>& i, const curve<T,F>& c)
+	inline F duration(const instrument_base<T,F>& i, const curve<T,F>& c)
 	{
 		return duration(i.m,i.u,i.c, c.n,c.t,c.f,c._f);
 	}
@@ -56,7 +56,7 @@ namespace pwflat {
 		// operator(), spot, discount inherited from curve
 
 		// extend curve
-		forward& next(const instrument<T,F>& i, F p = 0, F e = 0)
+		forward& next(const instrument_base<T,F>& i, F p = 0, F e = 0)
 		{
 			e = bootstrap::next(i.m,i.u,i.c, n,t,f, p,e);
 
@@ -124,11 +124,11 @@ inline void test_fms_forward()
 		double c = 0.05;
 		for (const auto ti : t) {
 			// semiannual par bond
-			f.next(bond<>(ti, SEMIANNUAL, c), 1);
+			f.next(instrument::bond<>(ti, instrument::SEMIANNUAL, c), 1);
 		}
 		// verify repricing
 		for (const auto ti : t) {
-			auto b = bond<>(ti, SEMIANNUAL, c);
+			auto b = instrument::bond<>(ti, instrument::SEMIANNUAL, c);
 			double pv = pwflat::present_value(b, f);
 			assert (fabs(pv - 1) <= std::numeric_limits<double>::epsilon());
 		}
@@ -149,15 +149,13 @@ inline void test_fms_forward()
 
 		for (int i = 0; i < sizeof(t) / sizeof(*t); i++) {
 			// semiannual par bond
-			// !!! set breakpoint here
-			f.next(bond<>(t[i], SEMIANNUAL, rc[i]), 1);
+			f.next(instrument::bond<>(t[i], instrument::SEMIANNUAL, rc[i]), 1);
 		}
 		
 		// verify repricing
 		for (int i = 0; i < sizeof(t) / sizeof(*t); i++) {
-			auto b = bond<>(t[i], SEMIANNUAL, rc[i]);
+			auto b =instrument:: bond<>(t[i], instrument::SEMIANNUAL, rc[i]);
 			double pv = pwflat::present_value(b, f);
-			//!!! find out why this is failing !!!
 			double x; 
 			x = pv - 1;
 			assert (fabs(x) < 10*std::numeric_limits<double>::epsilon());

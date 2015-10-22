@@ -8,26 +8,26 @@ namespace fms {
 
 	// NOT a value type
 	template<class U = double, class C = double>
-	struct instrument {
+	struct instrument_base {
 		size_t m;
 		const U* u; // times
 		const C* c; // cash flows
 
-		instrument(size_t m = 0, const U* u = nullptr, const C* c = nullptr)
+		instrument_base(size_t m = 0, const U* u = nullptr, const C* c = nullptr)
 			: m(m), u(u), c(c)
 		{ }
-		instrument(const instrument&) = delete;
-		instrument& operator=(const instrument&) = delete;
-		virtual ~instrument()
+		instrument_base(const instrument_base&) = delete;
+		instrument_base& operator=(const instrument_base&) = delete;
+		virtual ~instrument_base()
 		{ }
 
-		bool operator==(const instrument& i) const
+		bool operator==(const instrument_base& i) const
 		{
 			return m == i.m 
 				&& std::equal(u, u + m, i.u, i.u + i.m)
 				&& std::equal(c, c + m, i.c, i.c + i.m);
 		}
-		bool operator!=(const instrument& i) const
+		bool operator!=(const instrument_base& i) const
 		{
 			return !operator==(i);
 		}
@@ -41,23 +41,23 @@ namespace fms {
 
 	//!!! put in another file
 	template<class U = double, class C = double>
-	class vector_instrument : public instrument<U,C> {
+	class vector_instrument : public instrument_base<U,C> {
 	protected:
 		std::vector<U> u_;
 		std::vector<C> c_;
 	public:
 		vector_instrument(size_t m = 0)
-			: instrument<U,C>(m), u_(m), c_(m)
+			: instrument_base<U,C>(m), u_(m), c_(m)
 		{
 			// this must occur after u_, c_ created
-			instrument<U,C>::u = u_.data();
-			instrument<U,C>::c = c_.data();
+			instrument_base<U,C>::u = u_.data();
+			instrument_base<U,C>::c = c_.data();
 		}
 		vector_instrument(size_t m, const U* u, const C* c)
-			: instrument<U,C>(m), u_(u, u + m), c_(c, c + m)
+			: instrument_base<U,C>(m), u_(u, u + m), c_(c, c + m)
 		{
-			instrument<U,C>::u = u_.data();
-			instrument<U,C>::c = c_.data();
+			instrument_base<U,C>::u = u_.data();
+			instrument_base<U,C>::c = c_.data();
 		}
 		vector_instrument(const std::vector<U>& u, const std::vector<C>& c)
 			: vector_instrument(u.size(), u.data(), c.data())
@@ -65,8 +65,8 @@ namespace fms {
 			if (u_.size() != c_.size())
 				throw std::runtime_error(__FILE__ ": " __FUNCTION__ ": cash flow times must equal the number of cash flows");
 
-			instrument<U,C>::u = u_.data();
-			instrument<U,C>::c = c_.data();
+			instrument_base<U,C>::u = u_.data();
+			instrument_base<U,C>::c = c_.data();
 		}
 		vector_instrument(const vector_instrument& i)
 			: vector_instrument(i.u_, i.c_)
@@ -86,7 +86,8 @@ namespace fms {
 		// insert(U, C) ...
 	};
 
-	//!!! put in another file
+namespace instrument {
+
 	enum frequency { 
 		NONE = 0,
 		ANNUAL = 1,
@@ -95,6 +96,7 @@ namespace fms {
 		MONTHLY = 12
 	};
 
+	// periodic coupons plus notional at maturity
 	template<class U = double, class C = double>
 	struct bond : public vector_instrument<U,C> {
 		bond(U maturity = 0, frequency freq = NONE, C coupon = 0)
@@ -109,6 +111,24 @@ namespace fms {
 		}
 	};
 
+	// single cash flow 1 + r*t at u
+	// initial price is usually 1
+	template<class U = double, class C = double>
+	struct cd : public vector_instrument<U,C> {
+		cd(U maturity = 0, C coupon = 0)
+			: vector_instrument(1)
+		{
+			u_[0] = maturity;
+			c_[0] = 1 + coupon*maturity;
+		}
+	};
+	// foward rate agreement with two cash flows: -1 at u and 1 + c(v-u) at v
+	// initial price is usually 0
+	template<class U = double, class C = double>
+	struct fra : public vector_instrument<U,C> {
+		// !!! implement here
+	};
+} // instrument
 } // fms
 
 #ifdef _DEBUG
@@ -117,12 +137,7 @@ namespace fms {
 inline void test_fms_instrument()
 {
 	using namespace fms;
-
-	{ //!!!test fms::instrument
-	}
-
-	{ //!!!test fms::vector_instrument
-	}
+	using namespace instrument;
 
 	{
 		bond<> b(3, SEMIANNUAL, 0.05);
@@ -146,6 +161,12 @@ inline void test_fms_instrument()
 		assert (b2 == b);
 		b = b2;
 		assert (!(b != b2));
+	}
+	{
+		//!!! test fms::instrument::cd
+	}
+	{
+		//!!! test fms::instrument::fra
 	}
 }
 
