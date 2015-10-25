@@ -39,7 +39,6 @@ namespace fms {
 		}
 	};
 
-	//!!! put in another file
 	template<class U = double, class C = double>
 	class vector_instrument : public instrument_base<U,C> {
 	protected:
@@ -97,6 +96,7 @@ namespace instrument {
 	};
 
 	// periodic coupons plus notional at maturity
+	// initial price is usually 1 (par)
 	template<class U = double, class C = double>
 	struct bond : public vector_instrument<U,C> {
 		bond(U maturity = 0, frequency freq = NONE, C coupon = 0)
